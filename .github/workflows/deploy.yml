@@ -1,5 +1,8 @@
-# PriceLens 在线发布：push main 即自动构建并部署到 GitHub Pages。
+# PriceLens Copilot 在线发布：push main 即自动构建并部署到 GitHub Pages（独立链接）。
 # 产物 = pricelens/dist（自包含单文件，无外部资源引用，任意 base path 可用）。
+# 在线静态托管没有 agent-server：构建前移除 .env.production，
+# 使 Agent 走本地确定性适配器（数值本就全部由本地引擎计算，页面完整可用）。
+# 真实方舟模式仍按 README 本地运行 agent-server。
 name: Deploy to GitHub Pages
 
 on:
@@ -35,9 +38,11 @@ jobs:
       - name: Tests
         working-directory: pricelens
         run: npm run test -- --run
-      - name: Build (vite build + sync-single)
+      - name: Build (静态托管模式：无 agent-server，走本地确定性适配器)
         working-directory: pricelens
-        run: npm run build
+        run: |
+          rm .env.production
+          npm run build
       - name: Verify data and build artifacts
         working-directory: pricelens
         run: npm run verify
